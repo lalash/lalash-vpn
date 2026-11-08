@@ -92,15 +92,11 @@ object AppConfig {
     const val PREF_ST_SKIP_DEAD = "pref_st_skip_dead"
     const val PREF_ST_FETCH_EXIT_IP = "pref_st_fetch_exit_ip"
     const val PREF_ST_VERIFY_TLS = "pref_st_verify_tls"
-    /** Custom download URL, tried before the built-in servers. */
+    /** Selected download test URL; the others in the list are fallbacks. */
     const val PREF_ST_DOWN_URL = "pref_st_down_url"
-    /** Comma-separated keys of the built-in download servers that are turned off. */
-    const val PREF_ST_DOWN_SERVERS_OFF = "pref_st_down_servers_off"
     const val PREF_ST_UP_URL = "pref_st_up_url"
     const val PREF_ST_PING_URL = "pref_st_ping_url"
     const val PREF_ST_DOWNLOAD_SIZE_MB = "pref_st_download_size_mb"
-    /** Former default; the file was removed (it now serves 7 bytes), so it is ignored if stored. */
-    const val ST_DEAD_DOWN_URL = "https://cachefly.cachefly.net/100mb.test"
     const val ST_DEFAULT_UP_URL = "https://speed.cloudflare.com/__up"
     const val ST_DEFAULT_PING_URL = "https://cp.cloudflare.com/generate_204"
     const val ST_META_URL = "https://speed.cloudflare.com/cdn-cgi/trace"

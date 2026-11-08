@@ -1,39 +1,43 @@
 package com.v2ray.ang.handler
 
-import com.v2ray.ang.AppConfig
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class SpeedTestDownUrlsTest {
-    private val all = SpeedTestSettings.DOWNLOAD_SERVERS.map { it.url }
+    private val all = SpeedTestSettings.DOWNLOAD_URLS
 
     @Test
-    fun defaultsUseEveryBuiltInServerInOrder() {
-        assertEquals(all, SpeedTestSettings.resolveDownUrls(null, null))
-        assertEquals(all, SpeedTestSettings.resolveDownUrls("  ", ""))
+    fun listMatchesTheDesktopTesterOrder() {
+        assertEquals(
+            listOf(
+                "https://cachefly.cachefly.net/100mb.test",
+                "https://speed.cloudflare.com/__down?bytes={bytes}",
+                "https://proof.ovh.net/files/100Mb.dat",
+                "https://fsn1-speed.hetzner.com/100MB.bin",
+            ),
+            all
+        )
     }
 
     @Test
-    fun customUrlIsTriedFirstAndNotDuplicated() {
+    fun nothingSelectedUsesTheListInOrder() {
+        assertEquals(all, SpeedTestSettings.resolveDownUrls(null))
+        assertEquals(all, SpeedTestSettings.resolveDownUrls("  "))
+    }
+
+    @Test
+    fun selectedUrlGoesFirstAndTheRestAreFallbacks() {
+        assertEquals(listOf(all[2], all[0], all[1], all[3]), SpeedTestSettings.resolveDownUrls(all[2]))
+    }
+
+    @Test
+    fun olderCustomUrlIsKeptFirst() {
         val custom = "https://example.com/big.bin"
-        assertEquals(listOf(custom) + all, SpeedTestSettings.resolveDownUrls(custom, null))
-        assertEquals(listOf(all[1]) + (all - all[1]), SpeedTestSettings.resolveDownUrls(all[1], null))
+        assertEquals(listOf(custom) + all, SpeedTestSettings.resolveDownUrls(custom))
     }
 
     @Test
-    fun retiredDefaultIsIgnored() {
-        assertEquals(all, SpeedTestSettings.resolveDownUrls(AppConfig.ST_DEAD_DOWN_URL, null))
-    }
-
-    @Test
-    fun switchedOffServersAreSkipped() {
-        val off = SpeedTestSettings.DOWNLOAD_SERVERS.take(2).joinToString(",") { it.key }
-        assertEquals(all.drop(2), SpeedTestSettings.resolveDownUrls(null, off))
-    }
-
-    @Test
-    fun allSwitchedOffFallsBackToEveryServer() {
-        val off = SpeedTestSettings.DOWNLOAD_SERVERS.joinToString(",") { it.key }
-        assertEquals(all, SpeedTestSettings.resolveDownUrls(null, off))
+    fun defaultTopNIsTen() {
+        assertEquals(10, SpeedTestSettings.DEFAULT_TOP_N)
     }
 }

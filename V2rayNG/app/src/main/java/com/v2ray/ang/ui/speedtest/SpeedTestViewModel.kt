@@ -148,7 +148,7 @@ class SpeedTestViewModel(application: Application) : AndroidViewModel(applicatio
             }
 
             is SpeedTestAction.ChangeTopN -> {
-                val next = (_uiState.value.topN + action.delta).coerceIn(1, 500)
+                val next = stepTopN(_uiState.value.topN, action.delta)
                 MmkvManager.encodeSettings(AppConfig.PREF_ST_TOP_N, next)
                 _uiState.update { it.copy(topN = next) }
             }
@@ -391,4 +391,14 @@ class SpeedTestViewModel(application: Application) : AndroidViewModel(applicatio
             }.thenBy { it.result.pingMs ?: Long.MAX_VALUE }
         }
     }
+}
+
+/**
+ * Next "top N" value for a +/- press of [delta] (a multiple of 5): snaps to the multiples of 5 so
+ * 10, 20, ... are always reachable from any stored value, within 1..500.
+ */
+internal fun stepTopN(current: Int, delta: Int): Int {
+    val step = kotlin.math.abs(delta).coerceAtLeast(1)
+    val next = if (delta > 0) (current / step + 1) * step else ((current - 1) / step) * step
+    return next.coerceIn(1, 500)
 }

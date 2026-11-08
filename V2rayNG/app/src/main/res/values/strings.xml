@@ -668,14 +668,14 @@
     <string name="speedtest_pref_skip_dead_summary">Configs that do not answer the ping are not speed tested</string>
     <string name="speedtest_pref_fetch_exit_ip">Fetch exit IP and country</string>
     <string name="speedtest_pref_verify_tls">Verify TLS certificate</string>
-    <string name="speedtest_pref_down_url">Custom download URL (tried first, optional)</string>
+    <string name="speedtest_pref_down_url">Download URL</string>
     <string name="speedtest_pref_up_url">Upload URL</string>
     <string name="speedtest_ping_url_same_as_app">Same as the app real ping URL (Settings)</string>
     <string name="speedtest_pref_ping_url">Ping URL</string>
     <string name="speedtest_pref_download_size">Download request size (MB)</string>
     <string name="speedtest_note_measure">Speed is the slope of the steady part of the curve, not the overall average. Warm-up is the start of each test that is discarded to remove TCP slow-start.</string>
     <string name="speedtest_note_pacing">Parallel speed tests split your line between them and each shows about half the real speed, so speed tests run one at a time.</string>
-    <string name="speedtest_note_server">If a download server fails or limits you (error 429), the next server in the list is used automatically.</string>
+    <string name="speedtest_note_server">If the selected download URL sends no data through a config, the others in the list are tried automatically. A 429 error means the test server is limiting you, not the config.</string>
 
     <!-- Lalash-NG: config list sort, subscription edit, new subscription -->
     <string name="main_sub_new">New</string>
@@ -772,8 +772,6 @@
     <string name="theme_teal">Navy and teal</string>
     <string name="theme_green">Green and black</string>
     <string name="drawer_forked_from">Forked from v2rayNG</string>
-    <string name="speedtest_pref_down_servers">Download test servers</string>
-    <string name="speedtest_pref_down_servers_summary">Tried from top to bottom: if a server does not answer through a config, the next one is used.</string>
     <string name="menu_add_quick_tile">Add to quick settings</string>
     <string name="quick_tile_added">lalash vpn is in your quick settings</string>
     <string name="quick_tile_manual">Pull down the notification shade, tap the edit (pencil) button and drag the lalash vpn tile into the panel.</string>

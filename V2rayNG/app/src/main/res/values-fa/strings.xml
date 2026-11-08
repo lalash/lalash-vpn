@@ -667,14 +667,14 @@
     <string name="speedtest_pref_skip_dead_summary">کانفیگ‌هایی که پینگ نمی‌دهند تست سرعت نمی‌شوند</string>
     <string name="speedtest_pref_fetch_exit_ip">دریافت IP و کشور خروجی</string>
     <string name="speedtest_pref_verify_tls">بررسی گواهی TLS</string>
-    <string name="speedtest_pref_down_url">آدرس دانلود دلخواه (اول امتحان می‌شود، اختیاری)</string>
+    <string name="speedtest_pref_down_url">آدرس دانلود</string>
     <string name="speedtest_pref_up_url">آدرس آپلود</string>
     <string name="speedtest_ping_url_same_as_app">همان آدرس تست پینگ خود برنامه (تنظیمات)</string>
     <string name="speedtest_pref_ping_url">آدرس پینگ</string>
     <string name="speedtest_pref_download_size">حجم درخواستی دانلود (MB)</string>
     <string name="speedtest_note_measure">سرعت از شیب بخش پایدار منحنی حساب می‌شود، نه میانگین کل. «گرم‌کردن» ابتدای هر تست است که برای حذف اثر TCP slow-start دور ریخته می‌شود.</string>
     <string name="speedtest_note_pacing">تست سرعت موازی، خط اینترنت را بین تست‌ها تقسیم می‌کند و هر کدام حدود نصف سرعت واقعی را نشان می‌دهد؛ برای همین تست‌ها یکی‌یکی اجرا می‌شوند.</string>
-    <string name="speedtest_note_server">اگر یک سرور دانلود جواب ندهد یا محدودتان کند (خطای 429)، سرور بعدی لیست خودکار استفاده می‌شود.</string>
+    <string name="speedtest_note_server">اگر آدرس دانلود انتخاب‌شده از طریق یک کانفیگ داده نفرستد، بقیه‌ی آدرس‌های لیست خودکار امتحان می‌شوند. خطای 429 یعنی سرور تست محدودتان کرده، نه کانفیگ.</string>
 
     <!-- Lalash-NG: config list sort, subscription edit, new subscription -->
     <string name="main_sub_new">جدید</string>
@@ -771,8 +771,6 @@
     <string name="theme_teal">سرمه‌ای و فیروزه‌ای</string>
     <string name="theme_green">سبز و مشکی</string>
     <string name="drawer_forked_from">فورک‌شده از v2rayNG</string>
-    <string name="speedtest_pref_down_servers">سرورهای تست دانلود</string>
-    <string name="speedtest_pref_down_servers_summary">به ترتیب از بالا امتحان می‌شوند؛ اگر سروری از طریق کانفیگ جواب ندهد، سرور بعدی استفاده می‌شود.</string>
     <string name="menu_add_quick_tile">افزودن به پنل بالای گوشی</string>
     <string name="quick_tile_added">دکمه lalash vpn به پنل بالای گوشی اضافه شد</string>
     <string name="quick_tile_manual">پنل بالای گوشی را پایین بکشید، دکمه ویرایش (مداد) را بزنید و کاشی lalash vpn را به پنل بکشید.</string>
