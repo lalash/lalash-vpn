@@ -2,6 +2,7 @@ package com.v2ray.ang.handler
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.core.CoreConfigManager
 import com.v2ray.ang.core.CoreNativeManager
@@ -72,6 +73,10 @@ class ConfigSpeedTester(
     private var speedTotal = 0
     @Volatile
     private var currentGuid: String? = null
+
+    /** Index in [SpeedTestSettings.downUrls] of the server that last worked; tried first. */
+    @Volatile
+    private var preferredDownIndex = 0
 
     suspend fun run(request: SpeedTestRequest) = withContext(Dispatchers.IO) {
         val guids = request.guids.distinct()
@@ -209,7 +214,12 @@ class ConfigSpeedTester(
         ) { client ->
             var partial = base
             if (mode.measuresDownload) {
-                val down = measureThroughput(client, upload = false) { live -> emit(partial.copy(liveMbps = live)) }
+                val downUrl = pickDownloadUrl(client)
+                val down = if (downUrl == null) {
+                    Throughput(null, "no download server answered")
+                } else {
+                    measureThroughput(client, upload = false, downUrl = downUrl) { live -> emit(partial.copy(liveMbps = live)) }
+                }
                 partial = partial.copy(downloadMbps = down.mbps, error = down.error, liveMbps = null)
                 emit(partial)
             }
@@ -273,9 +283,47 @@ class ConfigSpeedTester(
     private data class Sample(val t: Double, val n: Long)
     private data class Throughput(val mbps: Double?, val error: String?)
 
+    /**
+     * The first download server that really serves data through this config, starting with the
+     * one that worked last. A server that errors, times out or sends almost nothing (a removed
+     * test file, a block page) is skipped, so the test does not report 0 for every config.
+     */
+    private fun pickDownloadUrl(client: OkHttpClient): String? {
+        val urls = settings.downUrls
+        val probeClient = client.newBuilder().callTimeout(PROBE_TIMEOUT_SEC, TimeUnit.SECONDS).build()
+        for (step in urls.indices) {
+            val index = (preferredDownIndex + step) % urls.size
+            if (probeDownload(probeClient, urls[index])) {
+                preferredDownIndex = index
+                return urls[index]
+            }
+        }
+        return null
+    }
+
+    private fun probeDownload(client: OkHttpClient, url: String): Boolean = try {
+        client.newCall(downloadRequest(url)).execute().use { response ->
+            if (!response.isSuccessful) return false
+            val source = response.body.source()
+            val buffer = okio.Buffer()
+            var received = 0L
+            while (received < PROBE_BYTES) {
+                val read = source.read(buffer, 65_536)
+                if (read < 0) break
+                received += read
+                buffer.clear()
+            }
+            received >= PROBE_BYTES
+        }
+    } catch (e: Exception) {
+        LogUtil.w(AppConfig.TAG, "SpeedTest: download server ${Uri.parse(url).host} failed: ${e.message}")
+        false
+    }
+
     private suspend fun measureThroughput(
         client: OkHttpClient,
         upload: Boolean,
+        downUrl: String = "",
         onLive: (Double) -> Unit,
     ): Throughput = coroutineScope {
         val duration = if (upload) settings.durationUploadSec else settings.durationDownloadSec
@@ -296,7 +344,7 @@ class ConfigSpeedTester(
                 delay(index * 120L)
                 var backoff = 500L
                 while (isActive && !stop.get()) {
-                    val call = client.newCall(if (upload) uploadRequest(counter, stop) else downloadRequest())
+                    val call = client.newCall(if (upload) uploadRequest(counter, stop) else downloadRequest(downUrl))
                     calls.add(call)
                     try {
                         call.execute().use { response ->
@@ -359,9 +407,9 @@ class ConfigSpeedTester(
         }
     }
 
-    private fun downloadRequest(): Request {
+    private fun downloadRequest(downUrl: String): Request {
         val bytes = settings.downloadSizeMb.toLong() * 1024 * 1024
-        val url = settings.downUrl.replace("{bytes}", bytes.toString())
+        val url = downUrl.replace("{bytes}", bytes.toString())
         return Request.Builder().url(url)
             .header("Accept-Encoding", "identity")
             .header("Cache-Control", "no-cache")
@@ -429,6 +477,10 @@ class ConfigSpeedTester(
     }
 
     companion object {
+        /** A server must deliver this much within [PROBE_TIMEOUT_SEC] to be used for the test. */
+        private const val PROBE_BYTES = 512L * 1024
+        private const val PROBE_TIMEOUT_SEC = 8L
+
         private val UPLOAD_CHUNK = Random.nextBytes(128 * 1024)
 
         /**

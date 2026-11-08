@@ -1,0 +1,15 @@
+<!-- Single-colour mark for the status bar and the quick settings tile: the wordmark bar over the
+     "vpn" box of the app icon, with the box cut out as a window so it reads at 24dp. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M5,4h14a1.5,1.5 0,0 1,1.5 1.5v1a1.5,1.5 0,0 1,-1.5 1.5h-14a1.5,1.5 0,0 1,-1.5 -1.5v-1a1.5,1.5 0,0 1,1.5 -1.5z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M5,10h14a2,2 0,0 1,2 2v6a2,2 0,0 1,-2 2h-14a2,2 0,0 1,-2 -2v-6a2,2 0,0 1,2 -2zM7,13v4h10v-4z" />
+</vector>

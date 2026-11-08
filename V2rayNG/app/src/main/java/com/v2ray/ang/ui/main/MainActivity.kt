@@ -1,6 +1,9 @@
 package com.v2ray.ang.ui.main
 
+import android.app.StatusBarManager
+import android.content.ComponentName
 import android.content.Intent
+import android.graphics.drawable.Icon
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
@@ -13,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.service.QSTileService
 import com.v2ray.ang.core.LauncherManager
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
@@ -131,6 +135,7 @@ class MainActivity : HelperBaseComponentActivity() {
                     is MainAction.ShareFullContent -> shareFullContentAsync(action.guid)
                     is MainAction.OpenSubscriptionLink -> openSubscriptionLink(action.url)
                     MainAction.OpenExitChain -> navigateTo(MainDestination.ExitChain)
+                    MainAction.AddQuickTile -> requestAddQuickTile()
                     is MainAction.OpenGroupSpeedTest -> speedTestLauncher.launch(
                         Intent(this, SpeedTestActivity::class.java)
                             .putExtra(SpeedTestActivity.EXTRA_GROUP_ID, action.groupId)
@@ -151,6 +156,35 @@ class MainActivity : HelperBaseComponentActivity() {
             withContext(Dispatchers.Main) {
                 if (result == 0) toastSuccess(R.string.toast_success)
                 else toastError(R.string.toast_failure)
+            }
+        }
+    }
+
+    /**
+     * Offers the connect tile for the notification shade. Android 13 (API 33) added a system
+     * prompt for this; older versions only allow adding it from the shade's edit screen, so
+     * explain how instead.
+     */
+    private fun requestAddQuickTile() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            toast(R.string.quick_tile_manual)
+            return
+        }
+        val statusBar = getSystemService(StatusBarManager::class.java) ?: run {
+            toast(R.string.quick_tile_manual)
+            return
+        }
+        statusBar.requestAddTileService(
+            ComponentName(this, QSTileService::class.java),
+            getString(R.string.app_tile_name),
+            Icon.createWithResource(this, R.drawable.ic_stat_lalash),
+            mainExecutor
+        ) { result ->
+            when (result) {
+                StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ADDED,
+                StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ALREADY_ADDED -> toast(R.string.quick_tile_added)
+                StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_NOT_ADDED -> Unit
+                else -> toast(R.string.quick_tile_manual)
             }
         }
     }

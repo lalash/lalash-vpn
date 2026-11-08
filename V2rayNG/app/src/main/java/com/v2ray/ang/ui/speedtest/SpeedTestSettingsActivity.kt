@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import android.net.Uri
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.handler.MmkvManager.rememberMmkvBool
@@ -120,11 +121,43 @@ class SpeedTestSettingsActivity : BaseComponentActivity() {
     @Composable
     private fun ServerTab() {
         val d = SpeedTestSettings()
-        TextItem(R.string.speedtest_pref_down_url, AppConfig.PREF_ST_DOWN_URL, d.downUrl)
+        DownloadServersItem()
+        TextItem(R.string.speedtest_pref_down_url, AppConfig.PREF_ST_DOWN_URL, "")
         TextItem(R.string.speedtest_pref_up_url, AppConfig.PREF_ST_UP_URL, d.upUrl)
         PingUrlItem(d.pingUrl)
         NumberItem(R.string.speedtest_pref_download_size, AppConfig.PREF_ST_DOWNLOAD_SIZE_MB, d.downloadSizeMb.toString())
         Note(R.string.speedtest_note_server)
+    }
+
+    /**
+     * Built-in download servers, each with its own switch. They are tried in this order and the
+     * next one is used when a server does not answer; switched-off keys are stored.
+     */
+    @Composable
+    private fun DownloadServersItem() {
+        var offKeys by rememberMmkvString(AppConfig.PREF_ST_DOWN_SERVERS_OFF, "")
+        val off = offKeys.split(',').filter { it.isNotEmpty() }.toSet()
+        Text(
+            stringResource(R.string.speedtest_pref_down_servers),
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)
+        )
+        Text(
+            stringResource(R.string.speedtest_pref_down_servers_summary),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+        SpeedTestSettings.DOWNLOAD_SERVERS.forEach { server ->
+            SettingsSwitchItem(
+                title = server.label,
+                summary = Uri.parse(server.url).host,
+                checked = server.key !in off,
+                onCheckedChange = { on ->
+                    offKeys = (if (on) off - server.key else off + server.key).joinToString(",")
+                }
+            )
+        }
     }
 
     @Composable

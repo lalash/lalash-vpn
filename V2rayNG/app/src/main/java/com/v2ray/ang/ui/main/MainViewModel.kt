@@ -327,6 +327,7 @@ class MainViewModel(
             is MainAction.ShareFullContent,
             is MainAction.OpenGroupSpeedTest,
             MainAction.OpenExitChain,
+            MainAction.AddQuickTile,
             is MainAction.OpenSubscriptionLink -> {
                 // Handled by Activity via its onAction lambda
             }

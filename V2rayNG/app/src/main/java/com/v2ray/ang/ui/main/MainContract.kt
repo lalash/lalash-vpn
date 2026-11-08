@@ -92,5 +92,6 @@ sealed interface MainAction {
     ) : MainAction
     data class OpenGroupSpeedTest(val groupId: String) : MainAction
     data object OpenExitChain : MainAction
+    data object AddQuickTile : MainAction
     data class RetryNewSubscription(val groupId: String) : MainAction
 }

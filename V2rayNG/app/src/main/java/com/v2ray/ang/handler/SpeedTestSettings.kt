@@ -20,13 +20,39 @@ data class SpeedTestSettings(
     val skipDead: Boolean = true,
     val fetchExitIp: Boolean = false,
     val verifyTls: Boolean = true,
-    val downUrl: String = AppConfig.ST_DEFAULT_DOWN_URL,
+    /** Download servers in the order they are tried; the next one is used when one fails. */
+    val downUrls: List<String> = DOWNLOAD_SERVERS.map { it.url },
     val upUrl: String = AppConfig.ST_DEFAULT_UP_URL,
     val pingUrl: String = AppConfig.ST_DEFAULT_PING_URL,
     val downloadSizeMb: Int = 64,
 ) {
     companion object {
         const val DEFAULT_TOP_N = 20
+
+        /** A built-in download test server; `{bytes}` in [url] is replaced with the size to fetch. */
+        data class DownloadServer(val key: String, val label: String, val url: String)
+
+        val DOWNLOAD_SERVERS = listOf(
+            DownloadServer("cloudflare", "Cloudflare", "https://speed.cloudflare.com/__down?bytes={bytes}"),
+            DownloadServer("hetzner_de", "Hetzner (Germany)", "https://nbg1-speed.hetzner.com/100MB.bin"),
+            DownloadServer("hetzner_us", "Hetzner (USA)", "https://ash-speed.hetzner.com/100MB.bin"),
+            DownloadServer("hetzner_sg", "Hetzner (Singapore)", "https://sin-speed.hetzner.com/100MB.bin"),
+            DownloadServer("ovh_fr", "OVH (France)", "https://proof.ovh.net/files/100Mb.dat"),
+            DownloadServer("datapacket_de", "DataPacket (Germany)", "https://fra.download.datapacket.com/100mb.bin"),
+        )
+
+        /**
+         * Download URLs to try, in order: the custom URL first (unless empty or the retired
+         * default), then every built-in server not listed in [offKeys]. Never empty: if
+         * everything is turned off, all built-in servers are used.
+         */
+        fun resolveDownUrls(custom: String?, offKeys: String?): List<String> {
+            val off = offKeys.orEmpty().split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet()
+            val builtIn = DOWNLOAD_SERVERS.filter { it.key !in off }.map { it.url }
+                .ifEmpty { DOWNLOAD_SERVERS.map { it.url } }
+            val first = custom?.trim()?.takeIf { it.isNotEmpty() && it != AppConfig.ST_DEAD_DOWN_URL }
+            return (listOfNotNull(first) + builtIn).distinct()
+        }
 
         /** Stored instead of a URL to follow the app's own real-ping test URL (Settings). */
         const val PING_URL_SAME_AS_APP = "app"
@@ -60,7 +86,10 @@ data class SpeedTestSettings(
                 skipDead = MmkvManager.decodeSettingsBool(AppConfig.PREF_ST_SKIP_DEAD, d.skipDead),
                 fetchExitIp = MmkvManager.decodeSettingsBool(AppConfig.PREF_ST_FETCH_EXIT_IP, d.fetchExitIp),
                 verifyTls = MmkvManager.decodeSettingsBool(AppConfig.PREF_ST_VERIFY_TLS, d.verifyTls),
-                downUrl = string(AppConfig.PREF_ST_DOWN_URL, d.downUrl),
+                downUrls = resolveDownUrls(
+                    MmkvManager.decodeSettingsString(AppConfig.PREF_ST_DOWN_URL),
+                    MmkvManager.decodeSettingsString(AppConfig.PREF_ST_DOWN_SERVERS_OFF),
+                ),
                 upUrl = string(AppConfig.PREF_ST_UP_URL, d.upUrl),
                 pingUrl = resolvePingUrl(string(AppConfig.PREF_ST_PING_URL, d.pingUrl)),
                 downloadSizeMb = int(AppConfig.PREF_ST_DOWNLOAD_SIZE_MB, d.downloadSizeMb, 1, 90),
@@ -75,7 +104,8 @@ data class SpeedTestSettings(
                 AppConfig.PREF_ST_STREAMS_DOWNLOAD, AppConfig.PREF_ST_STREAMS_UPLOAD,
                 AppConfig.PREF_ST_PING_PROBES, AppConfig.PREF_ST_PING_CONCURRENCY,
                 AppConfig.PREF_ST_MAX_PING, AppConfig.PREF_ST_REQUEST_TIMEOUT,
-                AppConfig.PREF_ST_DOWN_URL, AppConfig.PREF_ST_UP_URL, AppConfig.PREF_ST_PING_URL,
+                AppConfig.PREF_ST_DOWN_URL, AppConfig.PREF_ST_DOWN_SERVERS_OFF,
+                AppConfig.PREF_ST_UP_URL, AppConfig.PREF_ST_PING_URL,
                 AppConfig.PREF_ST_DOWNLOAD_SIZE_MB,
             ).forEach { MmkvManager.encodeSettings(it, null as String?) }
             val d = SpeedTestSettings()
