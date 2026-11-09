@@ -58,6 +58,13 @@ object CoreServiceManager {
     @Volatile
     private var isReloading = false
 
+    private val watchdog = ConnectionWatchdog(
+        isConnected = { isRunning() },
+        isBusy = { isReloading },
+        probe = { coreController.measureDelay(SettingsManager.getDelayTestUrl()) >= 0 },
+        reload = { reloadCore() },
+    )
+
     /** Tun descriptor the core was started with, null in the proxy only and root run modes. */
     private var currentVpnInterface: ParcelFileDescriptor? = null
 
@@ -124,6 +131,7 @@ object CoreServiceManager {
         currentVpnInterface = vpnInterface
         launchCore(service, vpnInterface)
         startNetworkMonitor(service)
+        watchdog.start(service)
     }
 
     @Throws(Exception::class)
@@ -205,6 +213,8 @@ object CoreServiceManager {
      */
     fun stopCoreLoop(): Boolean {
         connectionTestScope.coroutineContext.cancelChildren()
+        // Stop the kill switch first so it cannot reload the core while it is being stopped.
+        watchdog.stop(getService())
         val service = getService() ?: return false
 
         networkMonitor?.unregister()

@@ -21,5 +21,10 @@ enum class NotificationChannelType(
         channelId = "core_test_channel",
         channelNameRes = R.string.notification_channel_connection_checks,
         notificationId = 12
+    ),
+    CONNECTION_WATCH(
+        channelId = "connection_watch_channel",
+        channelNameRes = R.string.notification_channel_connection_watch,
+        notificationId = 14
     )
 }

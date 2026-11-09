@@ -53,6 +53,8 @@ import com.v2ray.ang.ui.settings.SettingsActivity
 import com.v2ray.ang.ui.speedtest.SpeedTestActivity
 import com.v2ray.ang.ui.subscription.SubSettingActivity
 import com.v2ray.ang.ui.usage.UsageActivity
+import com.v2ray.ang.ui.diagnostics.NetworkCheckActivity
+import com.v2ray.ang.ui.settings.KillSwitchActivity
 import com.v2ray.ang.ui.settings.ThemeActivity
 import com.v2ray.ang.ui.warp.ChainSettingsActivity
 import com.v2ray.ang.ui.warp.WarpSettingsActivity
@@ -202,6 +204,8 @@ class MainActivity : HelperBaseComponentActivity() {
             MainDestination.Warp -> Intent(this, WarpSettingsActivity::class.java)
             MainDestination.ExitChain -> Intent(this, ChainSettingsActivity::class.java)
             MainDestination.Theme -> Intent(this, ThemeActivity::class.java)
+            MainDestination.NetworkCheck -> Intent(this, NetworkCheckActivity::class.java)
+            MainDestination.KillSwitch -> Intent(this, KillSwitchActivity::class.java)
             MainDestination.SpeedTest -> {
                 speedTestLauncher.launch(Intent(this, SpeedTestActivity::class.java))
                 return

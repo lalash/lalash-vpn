@@ -76,6 +76,14 @@ object AppConfig {
     /** Accent palette key from [com.v2ray.ang.ui.compose.AppPalettes]; "" = original orange. */
     const val PREF_APP_PALETTE = "pref_app_palette"
 
+    /** Kill switch: keep apps blocked and reconnect when the connection is lost. */
+    const val PREF_KILL_SWITCH = "pref_kill_switch"
+    /** Kill switch: move to the next best config of the group if reconnecting does not help. */
+    const val PREF_KILL_SWITCH_AUTO_SWITCH = "pref_kill_switch_auto_switch"
+    /** Reported by the running VPN service (Android 10+): Android's own always-on / lockdown. */
+    const val PREF_VPN_ALWAYS_ON = "pref_vpn_always_on"
+    const val PREF_VPN_LOCKDOWN = "pref_vpn_lockdown"
+
     /** Config speed test (upload/download) settings. */
     const val PREF_ST_MODE = "pref_st_mode"
     const val PREF_ST_TOP_N = "pref_st_top_n"

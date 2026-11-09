@@ -38,6 +38,8 @@ enum class MainDestination(@DrawableRes val iconRes: Int, @StringRes val labelRe
     Warp(R.drawable.ic_globe_24dp, R.string.warp_settings_title),
     ExitChain(R.drawable.ic_link_24dp, R.string.chain_settings_title),
     Theme(R.drawable.ic_palette_24dp, R.string.theme_title),
+    NetworkCheck(R.drawable.ic_network_check_24dp, R.string.netcheck_title),
+    KillSwitch(R.drawable.ic_shield_24dp, R.string.killswitch_title),
     Subscriptions(R.drawable.ic_subscriptions_24dp, R.string.title_sub_setting),
     PerAppProxy(R.drawable.ic_per_apps_24dp, R.string.per_app_proxy_settings),
     Routing(R.drawable.ic_routing_24dp, R.string.routing_settings_title),
@@ -56,6 +58,8 @@ private val featureDrawerItems = listOf(
     MainDestination.SpeedTest,
     MainDestination.Warp,
     MainDestination.ExitChain,
+    MainDestination.NetworkCheck,
+    MainDestination.KillSwitch,
     MainDestination.Theme
 )
 

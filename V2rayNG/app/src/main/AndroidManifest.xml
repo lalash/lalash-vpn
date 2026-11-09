@@ -154,6 +154,12 @@
             android:name=".ui.settings.ThemeActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.diagnostics.NetworkCheckActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.settings.KillSwitchActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.speedtest.SpeedTestActivity"
             android:exported="false" />
         <activity
