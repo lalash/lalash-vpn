@@ -85,6 +85,14 @@ Everything v2rayNG does (VMess, VLESS, Trojan, Shadowsocks, SOCKS, HTTP, Hysteri
 - Connect with any of your configs as usual and leave the internet through WARP or a Psiphon server in the country you choose: *your config → WARP / Psiphon → internet*.
 - A small notice on the config list and dashboard shows when the chain is on.
 
+**Network check**
+- Checks the phone's own internet (not the VPN): router, DNS, Iranian sites and DNS servers (Shecan, Electro, Radar Game, Begzar, 403.online), foreign sites and international DNS servers.
+- Shows each one's ping and answer time or why it failed (DNS block, no reply, refused, SNI filtering), then a verdict: no network, modem, no internet, phone DNS, international internet cut, normal filtering or all good.
+
+**Kill switch**
+- When the connection is lost, apps stay blocked and the app reconnects by itself, optionally to the next best config.
+- Shortcut to Android's "Always-on VPN" and "Block connections without VPN" for full protection.
+
 **Themes**
 - The original orange or six green themes; the whole app follows the choice and the background stays white.
 
